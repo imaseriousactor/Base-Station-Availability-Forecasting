@@ -60,6 +60,9 @@ def load_data(path: str) -> pd.DataFrame:
         df["Month"] = df["RECDATE"].dt.month
         df["Weekday"] = df["RECDATE"].dt.weekday
 
+    float_cols = df.select_dtypes(include="float64").columns
+    df[float_cols] = df[float_cols].astype("float32")
+
     return df
 
 
@@ -470,4 +473,5 @@ def update_map(selected_date):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8050)
+    port = int(os.environ.get("PORT", 8050))
+    app.run(debug=False, host="0.0.0.0", port=port)
