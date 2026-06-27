@@ -16,7 +16,8 @@ SALT = "geo_project_2024"
 LAT_BOUNDS = (58.0, 61.0)
 LON_BOUNDS = (27.5, 32.5)
 
-df = pd.read_csv(INPUT_FILE, sep=";", encoding="utf-8-sig", low_memory=False)
+df = pd.read_csv(INPUT_FILE, sep=",", encoding="utf-8-sig", low_memory=False)
+
 df.columns = df.columns.str.strip()
 
 cols_to_drop = [c for c in [DUP_ID_COL, ADDR_COL] if c in df.columns]
@@ -29,7 +30,6 @@ def hash_station(code):
     if pd.isna(code):
         return np.nan
     return hashlib.sha256(f"{SALT}_{str(code).strip()}".encode()).hexdigest()[:12]
-
 
 df[ID_COL] = df[ID_COL].apply(hash_station)
 print("Коды станций захэшированы")
@@ -50,19 +50,14 @@ if n_outliers:
 df.loc[~valid_mask, [LAT_COL, LON_COL]] = np.nan
 
 # --- переводим реальные координаты в относительные XY (без геопривязки) ---
-# X — относительная позиция по долготе, Y — по широте (евклидова плоскость,
-# без искажения, т.к. это просто картинка, а не настоящая карта)
 if valid_mask.any():
     lat = df.loc[valid_mask, LAT_COL]
     lon = df.loc[valid_mask, LON_COL]
 
-    # масштабируем долготу с учётом сжатия на данной широте (cos(lat)),
-    # чтобы относительные расстояния между точками визуально не искажались
     mean_lat_rad = np.radians(lat.mean())
     x = (lon - lon.mean()) * np.cos(mean_lat_rad)
     y = (lat - lat.mean())
 
-    # нормализуем в диапазон [0, 100] для удобства отображения на картинке
     x_norm = 100 * (x - x.min()) / (x.max() - x.min())
     y_norm = 100 * (y - y.min()) / (y.max() - y.min())
 
@@ -70,10 +65,11 @@ if valid_mask.any():
     df.loc[valid_mask, "Y"] = y_norm
     print("Добавлены относительные координаты X, Y (0-100)")
 
-# убираем исходные реальные координаты — больше не нужны и не должны утекать
+# убираем исходные реальные координаты
 df.drop(columns=[LAT_COL, LON_COL], inplace=True)
 print(f"Колонки {LAT_COL}, {LON_COL} удалены — оставлены только относительные X, Y")
 
-df.to_csv(OUTPUT_FILE, sep=";", index=False, encoding="utf-8-sig")
-print(f"\nФайл сохранён: {OUTPUT_FILE}")
+parquet_output = OUTPUT_FILE.replace('.csv', '.parquet')
+df.to_parquet(parquet_output, index=False, compression='snappy')
+print(f"\n✅ Файл сохранён: {parquet_output}")
 print("Колонки итогового файла:", df.columns.tolist())

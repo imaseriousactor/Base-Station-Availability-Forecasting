@@ -222,3 +222,6 @@ __marimo__/
 *.csv
 *.xlsx
 dashboard/main_data_with_weather_anonymized.csv
+
+*.parquet
+!dashboard/main_data_with_weather_anonymized.parquet 

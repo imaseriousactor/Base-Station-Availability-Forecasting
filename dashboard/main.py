@@ -5,8 +5,10 @@ import plotly.express as px
 import plotly.graph_objects as go
 from dash import Dash, dcc, html, Input, Output
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CSV_PATH = os.path.join(BASE_DIR, 'dashboard', 'main_data_with_weather_anonymized.csv')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PARQUET_PATH = os.path.join(BASE_DIR, 'main_data_with_weather_anonymized.parquet')
+CSV_PATH = os.path.join(BASE_DIR, 'main_data_with_weather_anonymized.csv')
+DATA_PATH = PARQUET_PATH if os.path.exists(PARQUET_PATH) else CSV_PATH
 
 KPI_COLUMNS = {
     "2G": "Cell Avail 2G (%)",
@@ -38,7 +40,13 @@ LAG_DAYS = [0, 1, 2, 3, 5, 7]
 
 
 def load_data(path: str) -> pd.DataFrame:
-    df = pd.read_csv(path, sep=";", encoding="utf-8-sig", low_memory=False)
+    if path.endswith('.parquet'):
+        df = pd.read_parquet(path)
+    elif path.endswith('.gz'):
+        df = pd.read_csv(path, sep=";", encoding="utf-8-sig", 
+                        compression='gzip', low_memory=False)
+    else:
+        df = pd.read_csv(path, sep=";", encoding="utf-8-sig", low_memory=False)
 
     for col in CORR_CANDIDATES:
         if col in df.columns:
@@ -55,7 +63,7 @@ def load_data(path: str) -> pd.DataFrame:
     return df
 
 
-df = load_data(CSV_PATH)
+df = load_data(DATA_PATH)
 
 CORR_CANDIDATES = [c for c in CORR_CANDIDATES if c in df.columns]
 CORR_DEFAULT = [c for c in CORR_DEFAULT if c in CORR_CANDIDATES]
@@ -455,7 +463,7 @@ def update_map(selected_date):
     fig.update_layout(
         margin=dict(l=10, r=10, t=10, b=10),
         xaxis=dict(showgrid=False, zeroline=False, visible=False),
-        yaxis=dict(showgrid=False, zeroline=False, visible=False, scaleanchor="x"),  # сохраняет пропорции
+        yaxis=dict(showgrid=False, zeroline=False, visible=False, scaleanchor="x"),
         plot_bgcolor="#fafafa",
     )
     return fig
