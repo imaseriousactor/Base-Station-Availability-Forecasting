@@ -1,8 +1,10 @@
+import importlib.util
 import os
 import sys
-import importlib.util
 
-_FINAL_MODELS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'final_models')
+_FINAL_MODELS_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "final_models"
+)
 if _FINAL_MODELS_DIR not in sys.path:
     sys.path.append(_FINAL_MODELS_DIR)
 

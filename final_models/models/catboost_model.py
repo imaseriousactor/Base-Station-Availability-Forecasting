@@ -1,6 +1,5 @@
 import catboost as cb
 
-
 DEFAULT_PARAMS = dict(
     iterations=500,
     depth=6,
@@ -11,10 +10,7 @@ DEFAULT_PARAMS = dict(
 
 def build_model(scale_pos_weight, **params):
     return cb.CatBoostClassifier(
-        **params,
-        scale_pos_weight=scale_pos_weight,
-        random_seed=42,
-        verbose=0
+        **params, scale_pos_weight=scale_pos_weight, random_seed=42, verbose=0
     )
 
 

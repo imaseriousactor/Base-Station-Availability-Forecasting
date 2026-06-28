@@ -11,7 +11,7 @@ class LSTMModel(nn.Module):
             hidden_size=hidden_size,
             num_layers=num_layers,
             batch_first=True,
-            dropout=dropout if num_layers > 1 else 0.0
+            dropout=dropout if num_layers > 1 else 0.0,
         )
 
         self.fc = nn.Linear(hidden_size, 1)
@@ -35,6 +35,8 @@ class DiceLoss(nn.Module):
         probs = probs.view(-1, 1)
 
         intersection = (probs * targets).sum()
-        dice = (2. * intersection + self.eps) / (probs.sum() + targets.sum() + self.eps)
+        dice = (2.0 * intersection + self.eps) / (
+            probs.sum() + targets.sum() + self.eps
+        )
 
         return 1 - dice

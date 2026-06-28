@@ -8,13 +8,11 @@ def build_scaler():
 
 def build_model():
     """Без балансировки классов."""
-    return LogisticRegression(max_iter=1000, random_state=42, n_jobs=-1, solver='lbfgs')
+    return LogisticRegression(max_iter=1000, random_state=42, n_jobs=-1, solver="lbfgs")
 
 
 def build_model_balanced():
     """С балансировкой классов."""
     return LogisticRegression(
-        max_iter=1000,
-        random_state=42,
-        class_weight='balanced',
-        solver='lbfgs')
+        max_iter=1000, random_state=42, class_weight="balanced", solver="lbfgs"
+    )

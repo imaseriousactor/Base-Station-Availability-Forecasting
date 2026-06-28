@@ -1,16 +1,19 @@
 import pandas as pd
 import torch
 import torch.optim as optim
+from data_prep import load_and_prepare
+from models.gru import DiceLoss, GRUModel
 from sklearn.metrics import (
-    classification_report, confusion_matrix, roc_auc_score,
-    average_precision_score, precision_recall_curve,
+    average_precision_score,
+    classification_report,
+    confusion_matrix,
+    roc_auc_score,
 )
 
-from data_prep import load_and_prepare
-from models.gru import GRUModel, DiceLoss
-
 df_main_with_weather = pd.read_excel("main_data_with_weather.xlsx")
-X_train, X_test, y_train, y_test, train_df, test_df, feature_cols = load_and_prepare(df_main_with_weather)
+X_train, X_test, y_train, y_test, train_df, test_df, feature_cols = load_and_prepare(
+    df_main_with_weather
+)
 
 X_train_gru = X_train.values.reshape(X_train.shape[0], 1, X_train.shape[1])
 X_test_gru = X_test.values.reshape(X_test.shape[0], 1, X_test.shape[1])
@@ -24,11 +27,9 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 X_train_t, y_train_t = X_train_t.to(device), y_train_t.to(device)
 X_test_t, y_test_t = X_test_t.to(device), y_test_t.to(device)
 
-model = GRUModel(
-    input_size=X_train_gru.shape[2],
-    hidden_size=64,
-    num_layers=2
-).to(device)
+model = GRUModel(input_size=X_train_gru.shape[2], hidden_size=64, num_layers=2).to(
+    device
+)
 scale_pos_weight = (y_train == 0).sum() / (y_train == 1).sum()
 
 pos_weight = torch.tensor([scale_pos_weight], dtype=torch.float32).to(device)

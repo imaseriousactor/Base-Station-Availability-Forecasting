@@ -1,7 +1,7 @@
 import numpy as np
+from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import roc_auc_score
 
 
 def run_time_series_cv(X, y, model_factory, n_splits=5, use_scaler=True, verbose=True):
@@ -29,7 +29,9 @@ def run_time_series_cv(X, y, model_factory, n_splits=5, use_scaler=True, verbose
         oof_proba[val_idx] = y_proba
 
         if verbose:
-            print(f"Fold {fold} | ROC-AUC: {score:.4f} | Train: {len(X_tr)} | Val: {len(X_val)}")
+            print(
+                f"{fold} | ROC-AUC {score:.4f} | Train {len(X_tr)} | Val {len(X_val)}"
+            )
 
     mean_auc = np.mean(cv_scores)
     std_auc = np.std(cv_scores)
@@ -41,5 +43,5 @@ def run_time_series_cv(X, y, model_factory, n_splits=5, use_scaler=True, verbose
         "models": cv_models,
         "oof_proba": oof_proba,
         "mean_auc": mean_auc,
-        "std_auc": std_auc
+        "std_auc": std_auc,
     }

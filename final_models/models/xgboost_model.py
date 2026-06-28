@@ -1,6 +1,5 @@
 import xgboost as xgb
 
-
 DEFAULT_PARAMS = dict(
     n_estimators=500,
     max_depth=6,
@@ -13,7 +12,7 @@ def build_model(scale_pos_weight, **params):
         **params,
         scale_pos_weight=scale_pos_weight,
         random_state=42,
-        eval_metric='logloss',
+        eval_metric="logloss",
         verbose=0
     )
 

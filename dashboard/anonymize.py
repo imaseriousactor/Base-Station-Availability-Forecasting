@@ -1,6 +1,7 @@
-import pandas as pd
-import numpy as np
 import hashlib
+
+import numpy as np
+import pandas as pd
 
 INPUT_FILE = "main_data_with_weather.csv"
 OUTPUT_FILE = "main_data_with_weather_anonymized.csv"
@@ -31,6 +32,7 @@ def hash_station(code):
         return np.nan
     return hashlib.sha256(f"{SALT}_{str(code).strip()}".encode()).hexdigest()[:12]
 
+
 df[ID_COL] = df[ID_COL].apply(hash_station)
 print("Коды станций захэшированы")
 
@@ -56,7 +58,7 @@ if valid_mask.any():
 
     mean_lat_rad = np.radians(lat.mean())
     x = (lon - lon.mean()) * np.cos(mean_lat_rad)
-    y = (lat - lat.mean())
+    y = lat - lat.mean()
 
     x_norm = 100 * (x - x.min()) / (x.max() - x.min())
     y_norm = 100 * (y - y.min()) / (y.max() - y.min())
@@ -69,7 +71,7 @@ if valid_mask.any():
 df.drop(columns=[LAT_COL, LON_COL], inplace=True)
 print(f"Колонки {LAT_COL}, {LON_COL} удалены — оставлены только относительные X, Y")
 
-parquet_output = OUTPUT_FILE.replace('.csv', '.parquet')
-df.to_parquet(parquet_output, index=False, compression='snappy')
+parquet_output = OUTPUT_FILE.replace(".csv", ".parquet")
+df.to_parquet(parquet_output, index=False, compression="snappy")
 print(f"\n✅ Файл сохранён: {parquet_output}")
 print("Колонки итогового файла:", df.columns.tolist())
