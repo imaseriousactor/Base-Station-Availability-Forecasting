@@ -23,3 +23,8 @@ repos:
       - id: mypy
         args: ["--ignore-missing-imports", "--no-strict-optional", "--explicit-package-bases"]
         additional_dependencies: []
+  - repo: https://github.com/nbQA-dev/nbQA
+    rev: 1.7.1
+    hooks:
+      - id: nbqa
+        args: ['--nbqa-mutate', 'flake8']  
