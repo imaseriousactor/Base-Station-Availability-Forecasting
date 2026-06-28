@@ -27,4 +27,5 @@ repos:
     rev: 1.7.1
     hooks:
       - id: nbqa
+        files: \.ipynb$
         args: ['--nbqa-mutate', 'flake8']  
