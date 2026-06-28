@@ -10,6 +10,7 @@
 - `baseline/`: простые модели (LogReg, RF, NaiveBayes)
 - `final_models/`: бустинги (XGBoost, LightGBM, CatBoost) и нейросети (LSTM, GRU)
 - `dashboard/`: деплой дашборда на HuggingFace Pages
+- `source/`: общий рабочий ноутбук проекта
 
 ## Данные
 
